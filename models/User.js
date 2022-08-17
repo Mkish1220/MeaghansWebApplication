@@ -1,75 +1,48 @@
 // schema and model form mongoose
 const { Schema, model } = require('mongoose');
-const { Thought } = require('./Thought');
 
-const userSchema = new Schema({
+const UserSchema = new Schema({
     username: {
-        type: String, 
+        type: String,
         required: true,
         unique: true,
         trim: true
     },
-},
-    {
-        email: {
-            type: String,
-            required: true,
-            unique: true,   
-            validate: {
-                validator: () => Promise.resolve(false),
-                message: 'Email validation failed'
-              }
-            }
-          },
-          
-    
 
-// user.email = 'test@test.co';
-// user.name = 'test';
-
-// let error;
-// try {
-//    user.validate();
-// } catch (err) {
-//   error = err;
-// }
-// assert.ok(error);
-// assert.equal(error.errors['name'].message, 'Oops!');
-// assert.equal(error.errors['email'].message, 'Email validation failed');
-
-
-
-       
-    Thought: [Thought.schema],
-        { 
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+        match: [/.+@.+\..+/]
+    },
+    thoughts: [
+        {
             type: Schema.Types.ObjectId,
-            ref: 'Thoughts',
+            ref: 'Thought'
         }
     ],
     friends: [
         {
             type: Schema.Types.ObjectId,
-            ref: 'User',
+            ref: 'User'
         }
     ]
+},
+    {
+        // set up  virtual for friendCount 
 
-
-
-
-// set up  virtual for friendCount 
- friendCount: {
-    type: Number,
-    toJSON: {
-      virtuals: true,
-    },
-
+        toJSON: {
+            virtuals: true,
+        },
+        id: false
     }
-    id: false,
-  
+);
+UserSchema.virtual('friendCount').get(function () {
+    return this.friends.length;
+});
 
+// create the User model using the UserSchema
+const User = model('User', UserSchema);
 
-// set up model 
-const User = model('user', userSchema);
-// export model 
+// export the User model
 module.exports = User;
-
