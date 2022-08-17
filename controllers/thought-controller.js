@@ -29,7 +29,7 @@
 
 // export your thought controller
 
-const { Thought } = require('../models');
+const Thought  = require('../models');
 
 module.exports = {
   getThoughts(req, res) {
